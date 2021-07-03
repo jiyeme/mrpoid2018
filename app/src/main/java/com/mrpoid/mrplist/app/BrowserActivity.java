@@ -1,8 +1,7 @@
 package com.mrpoid.mrplist.app;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.view.View;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.mrpoid.mrplist.view.BrowserFragment;
 
