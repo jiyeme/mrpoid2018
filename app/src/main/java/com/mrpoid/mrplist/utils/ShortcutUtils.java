@@ -14,29 +14,34 @@ import android.database.Cursor;
 import android.net.Uri;
 
 public class ShortcutUtils {
-	
+
+	// 应用名称
 	public static String getAppName(Context context) {
 		String appName = "";
 		try {
 			PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appName = context.getString(info.applicationInfo.labelRes);
 		} catch (NameNotFoundException e) {
+			e.printStackTrace();
 		}
 		
 		return appName;
 	}
-	
+
+	// 应用图标
 	public static int getAppIcon(Context context) {
 		int appIcon = 0;
 		try {
 			PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 			appIcon = info.applicationInfo.icon;
 		} catch (NameNotFoundException e) {
+			e.printStackTrace();
 		}
 		
 		return appIcon;
 	}
-	
+
+	// 是否有快捷方式
 	public static boolean hasShortcut(Context context, String title) {
 		final ContentResolver cr = context.getContentResolver();
 		final String AUTHORITY = "com.android.launcher.settings";
@@ -44,19 +49,19 @@ public class ShortcutUtils {
 		
 		Cursor c = cr.query(CONTENT_URI, new String[] { "title", "iconResource" }, "title=?", new String[] { title },
 				null);
-		if (c != null && c.getCount() > 0) {
-			return true;
-		}
-		
-		return false;
+		if(c == null)return false;
+		boolean ret = c.getCount() > 0;
+		c.close();
+		return ret;
 	}
-	
+
+	// 检查快捷方式是否已存在
 	public boolean shortCutExist(Context context, String title) {
-		boolean isInstallShortcut = false;
+		boolean isInstallShortcut;
 		final ContentResolver cr = context.getContentResolver();
 		
 		int versionLevel = android.os.Build.VERSION.SDK_INT;
-		String AUTHORITY = "com.android.launcher2.settings";
+		String AUTHORITY;
 		
 		// 2.2以上的系统的文件文件名字是不一样的
 		if (versionLevel >= 8) {
@@ -68,13 +73,14 @@ public class ShortcutUtils {
 		final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/favorites?notify=true");
 		Cursor c = cr.query(CONTENT_URI, new String[] { "title", "iconResource" }, "title=?", new String[] { title },
 				null);
-		
-		if (c != null && c.getCount() > 0) {
-			isInstallShortcut = true;
-		}
+
+		if(c == null)return false;
+		isInstallShortcut = c.getCount() > 0;
+		c.close();
 		return isInstallShortcut;
 	}
-	
+
+	// 创建快捷方式
 	public static void createShortCut(Activity app, String title, int icon, File path) {
 		String componetName = "com.mrpoid.app.ExternActivity";
 		// ComponentName comp = new ComponentName(this.getPackageName(),
